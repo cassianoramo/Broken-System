@@ -11,10 +11,12 @@ public class PlayerController : MonoBehaviour {
 	public float ForcaPulo = 1000f;
 	[HideInInspector] public bool viradoDireita = true;
 	public bool jump;
+	public BoxCollider2D bc;
 
 	void Start () {
 		anim = GetComponent<Animator> ();
 		rb2d = GetComponent<Rigidbody2D> ();
+		bc = bc.GetComponent<BoxCollider2D> ();
 	}
 	void Update () {
 		//Verifica se o player está tocando o chão
@@ -33,12 +35,18 @@ public class PlayerController : MonoBehaviour {
 		//Define as animações que serão feitas
 		if (translationX != 0 && tocaChao) {
 			anim.SetTrigger ("Run");
+			bc.size = new Vector3 (1.808332f, 3.115585f, 0);
+			bc.offset = new Vector3 (0, -0.25f, 0);
 		} else {
 			anim.SetTrigger ("Stand");
+			bc.size = new Vector3 (1.240831f, 3.5f, 0);
+			bc.offset = new Vector3 (0, 0, 0);
 		}
 		//Chama a animação do pulo e define sua força
 		if (jump == true) {
 			anim.SetTrigger ("Jump");
+			bc.size = new Vector3 (1.245875f, 2.814565f, 0);
+			bc.offset = new Vector3 (0.08144256f, 0.01039314f, 0);
 			rb2d.AddForce (new Vector2 (0f, ForcaPulo));
 			jump = false;
 		}
