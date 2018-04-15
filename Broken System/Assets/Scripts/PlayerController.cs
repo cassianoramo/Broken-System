@@ -12,6 +12,11 @@ public class PlayerController : MonoBehaviour {
 	[HideInInspector] public bool viradoDireita = true;
 	public bool jump;
 	public BoxCollider2D bc;
+	private bool sliding;
+	private float slidetime = 0f;
+	public float maxslidetime = 1.5f;
+	[SerializeField]
+	GameObject Slidecollider;
 
 	void Start () {
 		anim = GetComponent<Animator> ();
@@ -24,6 +29,22 @@ public class PlayerController : MonoBehaviour {
 		if ((Input.GetKeyDown("space"))&& tocaChao) {
 			jump = true;
 				}
+		if ((Input.GetButton("Slide")) && tocaChao && !sliding ) {
+			slidetime = 0;
+			anim.SetBool ("Slide", true);
+			bc.enabled = false;
+			sliding = true;
+			Slidecollider.gameObject.SetActive (true);
+		}
+		if (sliding ) {
+			slidetime += Time.deltaTime;
+			if (slidetime > maxslidetime) {
+				sliding = false;
+				anim.SetBool ("Slide", false);
+				bc.enabled = true;
+				Slidecollider.gameObject.SetActive (false);
+			}
+		}
 	}
 	void FixedUpdate()
 	{
@@ -36,10 +57,10 @@ public class PlayerController : MonoBehaviour {
 		if (translationX != 0 && tocaChao) {
 			anim.SetTrigger ("Run");
 			bc.size = new Vector3 (1.808332f, 3.115585f, 0);
-			bc.offset = new Vector3 (0, -0.25f, 0);
+			bc.offset = new Vector3 (0, 0, 0);
 		} else {
 			anim.SetTrigger ("Stand");
-			bc.size = new Vector3 (1.240831f, 3.5f, 0);
+			bc.size = new Vector3 (1.240831f,3.081203f, 0);
 			bc.offset = new Vector3 (0, 0, 0);
 		}
 		//Chama a animação do pulo e define sua força
@@ -48,6 +69,7 @@ public class PlayerController : MonoBehaviour {
 			bc.size = new Vector3 (1.245875f, 2.814565f, 0);
 			bc.offset = new Vector3 (0.08144256f, 0.01039314f, 0);
 			rb2d.AddForce (new Vector2 (0f, ForcaPulo));
+			sliding = false;
 			jump = false;
 		}
 		//Chama as animações pós-pulo
@@ -55,7 +77,7 @@ public class PlayerController : MonoBehaviour {
 			anim.SetTrigger ("Run");
 		} else {
 			anim.SetTrigger ("Stand");
-		}			
+		}		
 		//Define a direção ao qual o player está posicionado
 		if (translationX > 0 && !viradoDireita) {
 			Flip (); 
