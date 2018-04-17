@@ -14,7 +14,7 @@ public class PlayerController : MonoBehaviour {
 	public BoxCollider2D bc;
 	private bool sliding;
 	private float slidetime = 0f;
-	public float maxslidetime = 1.5f;
+	public float maxslidetime = 0.5f;
 	[SerializeField]
 	GameObject Slidecollider;
 
@@ -22,13 +22,15 @@ public class PlayerController : MonoBehaviour {
 		anim = GetComponent<Animator> ();
 		rb2d = GetComponent<Rigidbody2D> ();
 		bc = bc.GetComponent<BoxCollider2D> ();
+		Slidecollider.gameObject.SetActive (false);
 	}
 	void Update () {
-		//Verifica se o player está tocando o chão
+		//The groundcheck
 		tocaChao = Physics2D.Linecast (transform.position, posPe.position, 1 << LayerMask.NameToLayer ("Ground"));
 		if ((Input.GetKeyDown("space"))&& tocaChao) {
 			jump = true;
 				}
+		//Slide condition
 		if ((Input.GetButton("Slide")) && tocaChao && !sliding ) {
 			slidetime = 0;
 			anim.SetBool ("Slide", true);
@@ -45,15 +47,22 @@ public class PlayerController : MonoBehaviour {
 				Slidecollider.gameObject.SetActive (false);
 			}
 		}
+		if (!Input.GetButton ("Slide") && sliding) {
+			anim.SetTrigger ("Stand");
+			anim.SetBool ("Slide", false);
+			sliding = false;
+			Slidecollider.gameObject.SetActive (false);
+			bc.enabled = true;
+		}
 	}
 	void FixedUpdate()
 	{
-		//Movimentação do personagem
+		//Player moviment
 		float translationY = 0;
 		float translationX = Input.GetAxis ("Horizontal") * Velocidade;
 		transform.Translate (translationX, translationY, 0);
 		transform.Rotate (0, 0, 0);
-		//Define as animações que serão feitas
+		//Animations
 		if (translationX != 0 && tocaChao) {
 			anim.SetTrigger ("Run");
 			bc.size = new Vector3 (1.808332f, 3.115585f, 0);
@@ -63,7 +72,7 @@ public class PlayerController : MonoBehaviour {
 			bc.size = new Vector3 (1.240831f,3.081203f, 0);
 			bc.offset = new Vector3 (0, 0, 0);
 		}
-		//Chama a animação do pulo e define sua força
+		//Jump animation and force jump
 		if (jump == true) {
 			anim.SetTrigger ("Jump");
 			bc.size = new Vector3 (1.245875f, 2.814565f, 0);
@@ -72,13 +81,13 @@ public class PlayerController : MonoBehaviour {
 			sliding = false;
 			jump = false;
 		}
-		//Chama as animações pós-pulo
+		//Animatons after jump
 		if (jump == false && translationX != 0 && tocaChao) {
 			anim.SetTrigger ("Run");
 		} else {
 			anim.SetTrigger ("Stand");
 		}		
-		//Define a direção ao qual o player está posicionado
+		//Player direction
 		if (translationX > 0 && !viradoDireita) {
 			Flip (); 
 		} else if (translationX < 0 && viradoDireita)
@@ -89,7 +98,7 @@ public class PlayerController : MonoBehaviour {
 			Flip ();
 		  }
 	}
-	//Faz o personagem andar para as duas direções
+	//Flip script
 	void Flip()
 	{
 		viradoDireita = !viradoDireita;
