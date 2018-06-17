@@ -81,7 +81,7 @@ public class PlayerController : MonoBehaviour {
 			sliding = false;
 			jump = false;
 		}
-		//Animatons after jump
+		//Animations after jump
 		if (jump == false && translationX != 0 && tocaChao) {
 			anim.SetTrigger ("Run");
 		} else {
