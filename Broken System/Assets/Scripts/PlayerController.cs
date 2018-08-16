@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour {
 	private Animator anim;
@@ -13,10 +15,11 @@ public class PlayerController : MonoBehaviour {
 	public bool jump;
 	public BoxCollider2D bc;
 	private bool sliding;
-	private float slidetime = 0f;
-	public float maxslidetime = 0.5f;
+	float slidetime = 0f;
+	public float maxslidetime = 0.1f;
 	[SerializeField]
 	GameObject Slidecollider;
+	private bool attack = false; 
 
 	void Start () {
 		anim = GetComponent<Animator> ();
@@ -30,29 +33,8 @@ public class PlayerController : MonoBehaviour {
 		if ((Input.GetKeyDown("space"))&& tocaChao) {
 			jump = true;
 				}
-		//Slide condition
-		if ((Input.GetButton("Slide")) && tocaChao && !sliding ) {
-			slidetime = 0;
-			anim.SetBool ("Slide", true);
-			bc.enabled = false;
-			sliding = true;
-			Slidecollider.gameObject.SetActive (true);
-		}
-		if (sliding ) {
-			slidetime += Time.deltaTime;
-			if (slidetime > maxslidetime) {
-				sliding = false;
-				anim.SetBool ("Slide", false);
-				bc.enabled = true;
-				Slidecollider.gameObject.SetActive (false);
-			}
-		}
-		if (!Input.GetButton ("Slide") && sliding) {
-			anim.SetTrigger ("Stand");
-			anim.SetBool ("Slide", false);
-			sliding = false;
-			Slidecollider.gameObject.SetActive (false);
-			bc.enabled = true;
+		if ((Input.GetKeyDown (KeyCode.J)) && tocaChao ) {
+			attack = true;
 		}
 	}
 	void FixedUpdate()
@@ -97,6 +79,40 @@ public class PlayerController : MonoBehaviour {
 		} else if (translationX < 0 && viradoDireita) {
 			Flip ();
 		  }
+		//Slide script obs: need be fixed
+		if ((Input.GetButton("Slide")) && tocaChao && !sliding  ) {
+		slidetime = 0;
+		anim.SetBool ("Slide", true);
+		bc.enabled = false;
+		sliding = true;
+		Slidecollider.gameObject.SetActive (true);
+	}
+	if (sliding ) {
+		slidetime += Time.deltaTime;
+		if (slidetime > maxslidetime) {
+			sliding = false;
+			anim.SetBool ("Slide", false);
+			bc.enabled = true;
+			Slidecollider.gameObject.SetActive (false);
+		}
+	}
+	if (!Input.GetButton ("Slide") && sliding) {
+		anim.SetTrigger ("Stand");
+		anim.SetBool ("Slide", false);
+		sliding = false;
+		Slidecollider.gameObject.SetActive (false);
+		bc.enabled = true;
+	        }
+		//Regular attack
+		if (attack == true) {
+			anim.SetTrigger ("Attack");
+			attack = false;
+		}
+		if (attack == false && translationX != 0 && tocaChao) {
+			anim.SetTrigger ("Run");
+		} else {
+			anim.SetTrigger ("Stand");
+		}		
 	}
 	//Flip script
 	void Flip()
@@ -106,16 +122,23 @@ public class PlayerController : MonoBehaviour {
 		escala.x *= -1;
 		transform.localScale = escala;
 	}
+	void  OnTriggerEnter2D (Collider2D other){
+		if (other.gameObject.CompareTag ("Obstaculo")) {
+			string currentScene = SceneManager.GetActiveScene ().name;
+			SceneManager.LoadScene (currentScene);
+		}
+	}
+
 	//Método de dano do player
 	/*public void SubtraiVida()
-	{
+	
 		vida.fillAmount-=0.1f;
 		if (vida.fillAmount <= 0) {
 			MC.GameOver();
 			Destroy(gameObject);
-		}
-	}*/
-		}
+		}*/
+	}
+
 	
 
 
