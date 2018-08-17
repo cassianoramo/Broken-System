@@ -133,8 +133,10 @@ public class PlayerController : MonoBehaviour {
 	}
 	void  OnTriggerEnter2D (Collider2D other){
 		if (other.gameObject.CompareTag ("Obstaculo")) {
-			string currentScene = SceneManager.GetActiveScene ().name;
-			SceneManager.LoadScene (currentScene);
+			anim.SetTrigger ("Hurt");
+			anim.SetTrigger ("Stand");
+			Update ();
+
 		}
 	}
 
