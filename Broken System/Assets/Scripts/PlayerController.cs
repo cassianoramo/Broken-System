@@ -20,6 +20,7 @@ public class PlayerController : MonoBehaviour {
 	[SerializeField]
 	GameObject Slidecollider;
 	private bool attack = false; 
+	private bool AirAttack = false;
 
 	void Start () {
 		anim = GetComponent<Animator> ();
@@ -35,6 +36,9 @@ public class PlayerController : MonoBehaviour {
 				}
 		if ((Input.GetKeyDown (KeyCode.J)) && tocaChao ) {
 			attack = true;
+		}
+		if ((Input.GetKeyDown (KeyCode.J)) && !tocaChao ) {
+			AirAttack = true;
 		}
 	}
 	void FixedUpdate()
@@ -62,6 +66,7 @@ public class PlayerController : MonoBehaviour {
 			rb2d.AddForce (new Vector2 (0f, ForcaPulo));
 			sliding = false;
 			jump = false;
+			AirAttack = false;
 		}
 		//Animations after jump
 		if (jump == false && translationX != 0 && tocaChao) {
@@ -113,6 +118,10 @@ public class PlayerController : MonoBehaviour {
 		} else {
 			anim.SetTrigger ("Stand");
 		}		
+		if (AirAttack == true) {
+			anim.SetTrigger ("Air Attack");
+			AirAttack = false;
+		}
 	}
 	//Flip script
 	void Flip()
