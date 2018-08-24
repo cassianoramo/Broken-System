@@ -134,6 +134,9 @@ public class PlayerController : MonoBehaviour {
 	void  OnTriggerEnter2D (Collider2D other){
 		if (other.gameObject.CompareTag ("Obstaculo")) {
 			anim.SetTrigger ("Hurt");
+			jump = false;
+			attack = false;
+			sliding = false;
 			anim.SetTrigger ("Stand");
 			Update ();
 
