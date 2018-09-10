@@ -3,8 +3,9 @@ using System.Collections;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
+using UnityEngine.Networking;
 
-public class PlayerController : MonoBehaviour {
+public class PlayerController : NetworkBehaviour {
 	private Animator anim;
 	private Rigidbody2D rb2d;
 	public Transform posPe;
@@ -28,7 +29,11 @@ public class PlayerController : MonoBehaviour {
 		bc = bc.GetComponent<BoxCollider2D> ();
 		Slidecollider.gameObject.SetActive (false);
 	}
+
 	void Update () {
+		if (!isLocalPlayer) {
+			return;
+		}
 		//The groundcheck
 		tocaChao = Physics2D.Linecast (transform.position, posPe.position, 1 << LayerMask.NameToLayer ("Ground"));
 		if ((Input.GetKeyDown("space"))&& tocaChao) {
@@ -43,6 +48,9 @@ public class PlayerController : MonoBehaviour {
 	}
 	void FixedUpdate()
 	{
+		if (!isLocalPlayer) {
+			return;
+		}
 		//Player moviment
 		float translationY = 0;
 		float translationX = Input.GetAxis ("Horizontal") * Velocidade;
