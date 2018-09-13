@@ -34,6 +34,7 @@ public class PlayerController : NetworkBehaviour {
 		if (!isLocalPlayer) {
 			return;
 		}
+		CmdFlip ();
 		//The groundcheck
 		tocaChao = Physics2D.Linecast (transform.position, posPe.position, 1 << LayerMask.NameToLayer ("Ground"));
 		if ((Input.GetKeyDown("space"))&& tocaChao) {
@@ -87,11 +88,6 @@ public class PlayerController : NetworkBehaviour {
 			Flip (); 
 		} else if (translationX < 0 && viradoDireita)
 			Flip (); 
-		if (translationX > 0 && !viradoDireita) {
-			Flip ();
-		} else if (translationX < 0 && viradoDireita) {
-			Flip ();
-		  }
 		//Slide script obs: need be fixed
 		if ((Input.GetButton("Slide")) && tocaChao && !sliding  ) {
 		slidetime = 0;
@@ -150,11 +146,23 @@ public class PlayerController : NetworkBehaviour {
 
 		}
 	}
+	[Command]
+	void CmdFlip(){
+		RcpFlip ();
+	}
+	[ClientRpc]
+	void RcpFlip(){
+		float translationX = Input.GetAxis ("Horizontal") * Velocidade;
+		if (translationX > 0 && !viradoDireita) {
+			Flip (); 
+		} else if (translationX < 0 && viradoDireita)
+			Flip (); 
+	}
 
 	//Método de dano do player
 	/*public void SubtraiVida()
 	
-		vida.fillAmount-=0.1f;
+		/*vida.fillAmount-=0.1f;
 		if (vida.fillAmount <= 0) {
 			MC.GameOver();
 			Destroy(gameObject);
