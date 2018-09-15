@@ -24,12 +24,12 @@ public class PlayerController : NetworkBehaviour {
 	private bool AirAttack = false;
 
 	void Start () {
+
 		anim = GetComponent<Animator> ();
 		rb2d = GetComponent<Rigidbody2D> ();
 		bc = bc.GetComponent<BoxCollider2D> ();
 		Slidecollider.gameObject.SetActive (false);
 	}
-
 	void Update () {
 		if (!isLocalPlayer) {
 			return;
@@ -50,7 +50,7 @@ public class PlayerController : NetworkBehaviour {
 	{
 		if (!isLocalPlayer) {
 			return;
-		}
+		} 
 		//Player moviment
 		float translationY = 0;
 		float translationX = Input.GetAxis ("Horizontal") * Velocidade;
@@ -84,14 +84,9 @@ public class PlayerController : NetworkBehaviour {
 		}		
 		//Player direction
 		if (translationX > 0 && !viradoDireita) {
-			Flip (); 
+			CmdFlip ();
 		} else if (translationX < 0 && viradoDireita)
-			Flip (); 
-		if (translationX > 0 && !viradoDireita) {
-			Flip ();
-		} else if (translationX < 0 && viradoDireita) {
-			Flip ();
-		  }
+			CmdFlip ();
 		//Slide script obs: need be fixed
 		if ((Input.GetButton("Slide")) && tocaChao && !sliding  ) {
 		slidetime = 0;
@@ -131,14 +126,6 @@ public class PlayerController : NetworkBehaviour {
 			AirAttack = false;
 		}
 	}
-	//Flip script
-	void Flip()
-	{
-		viradoDireita = !viradoDireita;
-		Vector3 escala = transform.localScale;
-		escala.x *= -1;
-		transform.localScale = escala;
-	}
 	void  OnTriggerEnter2D (Collider2D other){
 		if (other.gameObject.CompareTag ("Obstaculo")) {
 			anim.SetTrigger ("Hurt");
@@ -147,19 +134,23 @@ public class PlayerController : NetworkBehaviour {
 			sliding = false;
 			anim.SetTrigger ("Stand");
 			Update ();
-
 		}
 	}
-
-	//Método de dano do player
-	/*public void SubtraiVida()
-	
-		vida.fillAmount-=0.1f;
-		if (vida.fillAmount <= 0) {
-			MC.GameOver();
-			Destroy(gameObject);
-		}*/
+	[Command]
+	void CmdFlip(){
+		RpcFlip ();
 	}
+	[ClientRpc]
+	void RpcFlip(){
+		viradoDireita = !viradoDireita;
+		Vector3 escala = transform.localScale;
+		escala.x *= -1;
+		transform.localScale = escala;
+	}
+}
+	
+	
+
 
 	
 
