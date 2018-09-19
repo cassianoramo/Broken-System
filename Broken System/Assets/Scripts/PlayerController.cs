@@ -24,7 +24,9 @@ public class PlayerController : NetworkBehaviour {
 	private bool AirAttack = false;
 
 	void Start () {
-
+		if (!isLocalPlayer) {
+			return;
+		}
 		anim = GetComponent<Animator> ();
 		rb2d = GetComponent<Rigidbody2D> ();
 		bc = bc.GetComponent<BoxCollider2D> ();
