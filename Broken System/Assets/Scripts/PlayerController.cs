@@ -6,7 +6,8 @@ using UnityEngine.SceneManagement;
 using UnityEngine.Networking;
 
 public class PlayerController : NetworkBehaviour {
-	private Animator anim;
+	private NetworkAnimator anim;
+	private Animator anim2;
 	private Rigidbody2D rb2d;
 	public Transform posPe;
 	[HideInInspector] public bool tocaChao = false;
@@ -27,7 +28,8 @@ public class PlayerController : NetworkBehaviour {
 		if (!isLocalPlayer) {
 			return;
 		}
-		anim = GetComponent<Animator> ();
+		anim = GetComponent<NetworkAnimator> ();
+		anim2 = GetComponent<Animator> ();
 		rb2d = GetComponent<Rigidbody2D> ();
 		bc = bc.GetComponent<BoxCollider2D> ();
 		Slidecollider.gameObject.SetActive (false);
@@ -85,14 +87,17 @@ public class PlayerController : NetworkBehaviour {
 			anim.SetTrigger ("Stand");
 		}		
 		//Player direction
-		if (translationX > 0 && !viradoDireita) {
-			CmdFlip ();
-		} else if (translationX < 0 && viradoDireita)
-			CmdFlip ();
+		if (translationX > 0 && !viradoDireita) { 
+		viradoDireita = !viradoDireita; 
+			CmdFlip (); 
+		} else if (translationX < 0 && viradoDireita) {
+			viradoDireita = !viradoDireita;
+			CmdFlip (); 
+		}
 		//Slide script obs: need be fixed
 		if ((Input.GetButton("Slide")) && tocaChao && !sliding  ) {
 		slidetime = 0;
-		anim.SetBool ("Slide", true);
+		anim2.SetBool ("Slide", true);
 		bc.enabled = false;
 		sliding = true;
 		Slidecollider.gameObject.SetActive (true);
@@ -101,14 +106,14 @@ public class PlayerController : NetworkBehaviour {
 		slidetime += Time.deltaTime;
 		if (slidetime > maxslidetime) {
 			sliding = false;
-			anim.SetBool ("Slide", false);
+			anim2.SetBool ("Slide", false);
 			bc.enabled = true;
 			Slidecollider.gameObject.SetActive (false);
 		}
 	}
 	if (!Input.GetButton ("Slide") && sliding) {
 		anim.SetTrigger ("Stand");
-		anim.SetBool ("Slide", false);
+		anim2.SetBool ("Slide", false);
 		sliding = false;
 		Slidecollider.gameObject.SetActive (false);
 		bc.enabled = true;
@@ -144,7 +149,7 @@ public class PlayerController : NetworkBehaviour {
 	}
 	[ClientRpc]
 	void RpcFlip(){
-		viradoDireita = !viradoDireita;
+
 		Vector3 escala = transform.localScale;
 		escala.x *= -1;
 		transform.localScale = escala;
